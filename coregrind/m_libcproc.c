@@ -326,7 +326,7 @@ void VG_(client_cmd_and_args)(HChar *buffer, SizeT buf_size)
 
    buffer[0] = '\0';
 
-   if (add_string(buffer, &buf_size, VG_(args_the_exename)) == False)
+   if (add_string(buffer, &buf_size, VG_(argv0_for_client)) == False)
       return;
 
    Int i;

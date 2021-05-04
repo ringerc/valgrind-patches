@@ -38,8 +38,13 @@
 // Command line pieces, after they have been extracted from argv in
 // m_main.main().  These are all NULL-terminated vectors.
 
-/* Args for the client. */
+/* Args for the client. Does not include the executable name conventionally
+ * supplied as argv[0]. */
 extern XArray* /* of HChar* */ VG_(args_for_client);
+
+/* argv[0] to supply to client. Same as args_the_exename unless the
+ * --with-argv0 command line option overrode it. */
+extern const HChar* VG_(argv0_for_client);
 
 /* Args for V.  This is the concatenation of the following:
    - contents of ~/.valgrindrc

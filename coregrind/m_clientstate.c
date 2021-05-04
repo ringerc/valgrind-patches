@@ -83,6 +83,9 @@ Int VG_(cl_psinfo_fd) = -1;
 /* Args for the client. */
 XArray* /* of HChar* */ VG_(args_for_client) = NULL;
 
+/* client argv[0], may differ from exename if --with-argv0 given */
+const HChar* VG_(argv0_for_client) = NULL;
+
 /* Args for V (augments, then those from the launcher). */
 XArray* /* of HChar* */ VG_(args_for_valgrind) = NULL;
 

@@ -407,6 +407,7 @@ Addr setup_client_stack( void*  init_sp,
    Int i;
 
    vg_assert(VG_IS_PAGE_ALIGNED(clstack_end+1));
+   vg_assert( VG_(argv0_for_client) != NULL);
    vg_assert( VG_(args_for_client) );
 
    /* use our own auxv as a prototype */
@@ -430,7 +431,7 @@ Addr setup_client_stack( void*  init_sp,
    }
 
    /* now scan the args we're given... */
-   stringsize += VG_(strlen)( VG_(args_the_exename) ) + 1;
+   stringsize += VG_(strlen)( VG_(argv0_for_client) ) + 1;
 
    for (i = 0; i < VG_(sizeXA)( VG_(args_for_client) ); i++) {
       argc++;
@@ -587,7 +588,7 @@ Addr setup_client_stack( void*  init_sp,
    if (info->interp_args)
       *ptr++ = (Addr)copy_str(&strtab, info->interp_args);
 
-   *ptr++ = (Addr)copy_str(&strtab, VG_(args_the_exename));
+   *ptr++ = (Addr)copy_str(&strtab, VG_(argv0_for_client));
 
    for (i = 0; i < VG_(sizeXA)( VG_(args_for_client) ); i++) {
       *ptr++ = (Addr)copy_str(
@@ -895,6 +896,7 @@ Addr setup_client_stack( void*  init_sp,
 
          case AT_EXECFN:
             /* points to the executable filename */
+            /* XXX should this be the argv0 instead? */
             auxv->u.a_ptr = copy_str(&strtab, VG_(args_the_exename));
             break;
 

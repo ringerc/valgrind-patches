@@ -476,6 +476,9 @@ static void process_option (Clo_Mode mode,
    else if VG_XACT_CLOM(cloE, arg, "-h", pos->need_help, 2) {}
    else if VG_XACT_CLOM(cloE, arg, "--help", pos->need_help, 2) {}
    else if VG_XACT_CLOM(cloE, arg, "--help-debug", pos->need_help, 3) {}
+   /* --with-argv0 must be handled extremely early by split_up_argv so
+    * nothing further gets done with it here. */
+   else if VG_XACT_CLOM(cloE, arg, "--with-argv0") {}
 
    // The tool has already been determined, but we need to know the name
    // here.
@@ -1485,6 +1488,7 @@ Int valgrind_main ( Int argc, HChar **argv, HChar **envp )
             * (HChar**) VG_(indexXA)( VG_(args_for_valgrind), i )
          );
       VG_(printf)(" exe %s\n", VG_(args_the_exename));
+      VG_(printf)(" argv0 %s\n", VG_(argv0_for_client));
       for (i = 0; i < VG_(sizeXA)( VG_(args_for_client) ); i++)
          VG_(printf)(
             "carg %s\n",
@@ -1598,7 +1602,7 @@ Int valgrind_main ( Int argc, HChar **argv, HChar **envp )
 #if defined(VGO_linux) || defined(SOLARIS_PROC_CMDLINE)
       /* Fake /proc/<pid>/cmdline only on Linux and Solaris if supported. */
       HChar  nul[1];
-      const HChar* exename;
+      const HChar* exe_argv0;
 
       VG_(debugLog)(1, "main", "Create fake /proc/<pid>/cmdline\n");
 
@@ -1608,8 +1612,8 @@ Int valgrind_main ( Int argc, HChar **argv, HChar **envp )
          VG_(err_config_error)("Can't create client cmdline file in %s\n", buf2);
 
       nul[0] = 0;
-      exename = VG_(args_the_exename);
-      VG_(write)(fd, exename, VG_(strlen)( exename ));
+      exe_argv0 = VG_(argv0_for_client);
+      VG_(write)(fd, exe_argv0, VG_(strlen)( exe_argv0 ));
       VG_(write)(fd, nul, 1);
 
       for (i = 0; i < VG_(sizeXA)( VG_(args_for_client) ); i++) {

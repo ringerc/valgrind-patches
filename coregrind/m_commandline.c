@@ -156,6 +156,7 @@ void VG_(split_up_argv)( Int argc, HChar** argv )
 {
           Int  i;
           Bool augment = True;
+          Bool explicit_argv0 = False;
    static Bool already_called = False;
 
    XArray* /* of HChar* */ tmp_xarray;
@@ -188,6 +189,8 @@ void VG_(split_up_argv)( Int argc, HChar** argv )
       }
       if (0 == VG_(strcmp)(argv[i], "--command-line-only=yes"))
          augment = False;
+      if (0 == VG_(strcmp)(argv[i], "--with-argv0"))
+         explicit_argv0 = True;
       if (argv[i][0] != '-')
 	break;
       add_string( tmp_xarray, argv[i] );
@@ -198,6 +201,16 @@ void VG_(split_up_argv)( Int argc, HChar** argv )
       vg_assert(argv[i]);
       VG_(args_the_exename) = argv[i];
       i++;
+   }
+
+   /* If --with-argv0 was passed, the caller asked us to give the client executable
+    * an argv[0] other than its true executable path, so we need to consume the first
+    * client argument. */
+   if (explicit_argv0) {
+      VG_(argv0_for_client) = argv[i];
+      i++;
+   } else {
+      VG_(argv0_for_client) = VG_(args_the_execname);
    }
 
    /* The rest are args for the client. */
